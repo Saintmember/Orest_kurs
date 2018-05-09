@@ -1,0 +1,37 @@
+if [ -e ./cash.scan ]
+then
+log=( $(cat ./cash.scan) )
+net="10.7.180."
+>now.tmp
+for i in {100..105}
+do
+	ip="$net$i"
+	ping -c1 $ip &>>/dev/null && echo "$ip +" || echo "$ip -"
+done >>now.tmp
+now=( $(cat ./now.tmp) )
+size_arr=${#now[@]}
+for (( i=0; i<size_arr; i++ ))
+do
+	if [ "${log[$i]}" != "${now[$i]}" ]
+	then
+		
+		 echo "${now[i-1]} ${now[$i]}"
+	fi
+done #>>mail.tmp
+exit
+cat ./mail.tmp | mail -s "ip=" root
+>cash.scan
+for i in "${now[@]}"
+do
+
+	echo "${now[$i]}"
+done >>cash.scan
+rm ./mail.tmp
+rm ./now.tmp
+else
+net="10.7.180."
+for i in {100..105}
+do
+        echo "$net$i -"
+done >>cash.scan
+fi
